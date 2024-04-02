@@ -1,0 +1,13 @@
+$osVer = (Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion")
+if (($osVer).GetValue('ProductName') -like "*2012*") {
+    Write-Host "Detected OS: 2012"
+    $cipherSuites = ((Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Cryptography\Configuration\SSL\00010002").Functions).split(",")
+    $requiredSuites = "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256", "TLS_DHE_RSA_WITH_AES_256_GCM_SHA256", "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256"
+    foreach ($suite in $requiredSuites) {
+        if ($suite -in $cipherSuites) {
+            Write-Host "Present: $suite" -ForegroundColor Green
+        } else {
+            Write-Host "Missing: $suite" -ForegroundColor Red
+        }
+    }
+}
